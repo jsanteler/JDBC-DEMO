@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'datenpersistenz'  # Verwenden Sie einen eindeutigen Namen
+      MYSQL_USER: 'root2'
+      MYSQL_PASSWORD: '1234'
+      MYSQL_ROOT_PASSWORD: '1234'
+    ports:
+      - '3306:3306'
+    volumes:
+      - my-db1:/var/lib/mysql  # Verwenden Sie den Standardpfad, wenn nicht anders benötigt
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
+volumes:
+  my-db1:
