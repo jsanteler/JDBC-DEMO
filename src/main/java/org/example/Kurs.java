@@ -2,24 +2,23 @@ package org.example;
 
 import java.sql.*;
 
-public class Jdbcdemo {
-
+public class Kurs {
     public static void main(String[] args) {
-        System.out.println("JDBC DEMO!");
-        // INSERT INTO `student` (`id`, `name`, `email`) VALUES (NULL, 'Julian Santeler', 'julian.santeler@myimst.at'), (NULL, 'Riccardo Burger', 'riburger@myimst.at');
+
 
         selectAllDemo();
-        insertStudentDemo("Name des Studenten", "Email@prova.at");
+        System.out.println();
+        insertKursDemo("POS",5);
         System.out.println();
         selectAllDemo();
         System.out.println();
-        updateStudentDemo(4, "Neuer Name", "neueemail@gmail.com");
-        selectAllDemo();
-        System.out.println();
-        deleteStudentDemo(5);
+        updateKursDemo(2,"Turnen",2);
         System.out.println();
         selectAllDemo();
-        findAllByNameLike("er");
+        System.out.println();
+        deleteKursDemo(6);
+        System.out.println();
+        findAllByNameLike("POS");
 
     }
 
@@ -32,18 +31,18 @@ public class Jdbcdemo {
 
         try(Connection conn = DriverManager.getConnection(connectionUrl,user,pwd))
         {
-            System.out.println("Verbindung zur DB hergestellt!");
 
 
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `student` WHERE `student`.`name` LIKE ?");
+
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `kurs` WHERE `kurs`.`name` LIKE ?");
             preparedStatement.setString(1,"%" +pattern +"%");
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()){
 
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                String email = rs.getString("email");
-                System.out.println("Student aus der DB: [ID] " + id + " [NAME] " + name + " [EMAIL] " + email);
+                int stunden = rs.getInt("stunden");
+                System.out.println("Kurs aus der DB: [ID] " + id + " [NAME] " + name + " [STUNDEN] " + stunden);
             }
         } catch (SQLException e){
             System.out.println("Fehler beim Aufbau der Verbindung zur DB: " + e.getMessage());
@@ -51,10 +50,10 @@ public class Jdbcdemo {
     }
 
 
-    public static void deleteStudentDemo(int studentId){
+    public static void deleteKursDemo(int kursId){
 
         System.out.println("DELETE Demo mit JDBC");
-        String connectionUrl = "jdbc:mysql://localhost:3306/datenpersitenz";
+        String connectionUrl = "jdbc:mysql://localhost:3306/datenpersistenz";
         String user = "root";
         String pwd = "1234";
 
@@ -63,11 +62,11 @@ public class Jdbcdemo {
             System.out.println("Verbindung zur DB hergestellt!");
 
             PreparedStatement preparedStatement = conn.prepareStatement(
-                    "DELETE FROM `student` WHERE `student` . `id` = ?"
+                    "DELETE FROM `kurs` WHERE `kurs` . `id` = ?"
             );
             try {
-                    preparedStatement.setInt(1,studentId);
-                    int rowAffected = preparedStatement.executeUpdate();
+                preparedStatement.setInt(1,kursId);
+                int rowAffected = preparedStatement.executeUpdate();
                 System.out.println("Anzahl der gelöschten Datensätze: " + rowAffected);
 
             } catch (SQLException ex) {
@@ -80,7 +79,7 @@ public class Jdbcdemo {
 
     }
 
-    public static void updateStudentDemo(int id, String neuerName, String neueEmail) {
+    public static void updateKursDemo(int id, String neuerName, int neueStunden) {
 
         System.out.println("UPDATE Demo mit JDBC");
         String connectionUrl = "jdbc:mysql://localhost:3306/datenpersistenz";
@@ -92,11 +91,11 @@ public class Jdbcdemo {
             System.out.println("Verbindung zur DB hergestellt!");
 
             PreparedStatement preparedStatement = conn.prepareStatement(
-                    "UPDATE `student` SET `name` = ?, `email`= ?WHERE `student`.`id`= ?"
+                    "UPDATE `kurs` SET `name` = ?, `stunden`= ? WHERE `kurs`.`id`= ?"
             );
             try {
                 preparedStatement.setString(1,neuerName);
-                preparedStatement.setString(2, neueEmail);
+                preparedStatement.setInt(2, neueStunden);
                 preparedStatement.setInt(3, id);
                 int affectedRows = preparedStatement.executeUpdate();
                 System.out.println("Anzahl der aktualisierten Datensätze: " + affectedRows);
@@ -104,12 +103,12 @@ public class Jdbcdemo {
                 System.out.println("Fehler im SQL-UPDATE Statemnet: " + ex.getMessage());
             }
         }catch (SQLException e) {
-                System.out.println("Fehler beim Aufbau der Verbindung zur DB: " + e.getMessage());
-            }
+            System.out.println("Fehler beim Aufbau der Verbindung zur DB: " + e.getMessage());
+        }
 
 
     }
-    public static void insertStudentDemo(String name, String email) {
+    public static void insertKursDemo(String name, int stunden) {
 
         System.out.println("INSERT Demo mit JDBC");
         String connectionUrl = "jdbc:mysql://localhost:3306/datenpersistenz";
@@ -121,12 +120,12 @@ public class Jdbcdemo {
             System.out.println("Verbindung zur DB hergestellt!");
 
             PreparedStatement preparedStatement = conn.prepareStatement(
-                    "INSERT INTO `student` (`id`, `name`, `email`) VALUES (NULL, ?, ?)"
+                    "INSERT INTO `kurs` (`id`, `name`, `stunden`) VALUES (NULL, ?, ?)"
             );
             try {
 
                 preparedStatement.setString(1,name);
-                preparedStatement.setString(2,email);
+                preparedStatement.setInt(2,stunden);
                 int rowAffected = preparedStatement.executeUpdate();
                 System.out.println(rowAffected+ "Datensätze eingefügt");
             } catch (SQLException ex){
@@ -161,17 +160,20 @@ public class Jdbcdemo {
             //Nexter datensatz landet in rs variable
             // mit rs.getint Spaltenaufruf
 
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `student`");
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM `kurs`");
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()){
 
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                String email = rs.getString("email");
-                System.out.println("Student aus der DB: [ID] " + id + " [NAME] " + name + " [EMAIL] " + email);
+                int stunden = rs.getInt("stunden");
+                System.out.println("Kurs aus der DB: [ID] " + id + " [NAME] " + name + " [STUNDEN] " + stunden);
             }
         } catch (SQLException e){
             System.out.println("Fehler beim Aufbau der Verbindung zur DB: " + e.getMessage());
         }
     }
 }
+
+
+

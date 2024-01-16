@@ -5,7 +5,7 @@ services:
     image: mysql:5.7
     environment:
       MYSQL_DATABASE: 'datenpersistenz'  # Verwenden Sie einen eindeutigen Namen
-      MYSQL_USER: 'root2'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '1234'
       MYSQL_ROOT_PASSWORD: '1234'
     ports:
